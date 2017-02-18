@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/activity_detalle"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin">
+
+<com.android.volley.toolbox.NetworkImageView
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:id="@+id/imagen"
+    android:layout_alignParentTop="true"/>
+
+    <TextView
+        android:text="Nombre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/_nombre"
+        android:layout_below="@+id/_imagen" />
+
+    <TextView
+        android:text="Pais"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/_nombre"
+
+        android:id="@+id/_pais" />
+
+    <TextView
+        android:text="Cantidad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/_pais"
+
+        android:id="@+id/_cantidad" />
+
+    <TextView
+        android:text="Uso"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/_cantidad"
+
+        android:id="@+id/_uso" />
+
+</RelativeLayout>
