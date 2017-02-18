@@ -33,5 +33,5 @@
                 android:id="@+id/textViewActividad" />
         </LinearLayout>
     </LinearLayout>
-    
+
 </LinearLayout>
