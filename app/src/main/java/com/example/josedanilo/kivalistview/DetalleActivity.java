@@ -1,8 +1,11 @@
 package com.example.josedanilo.kivalistview;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import com.android.volley.Response;
@@ -19,82 +22,78 @@ import org.json.JSONObject;
  */
 
 public class DetalleActivity extends AppCompatActivity {
+    public static Context mContext;
+    JSONObject jsonKivaP;
 
-    String jsonString;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detalle);
+        mContext=this;
 
-        jsonString = getIntent().getStringExtra("JSONObject");
+        setTitle("Detalles de la persona");
+
+        String tempkiva=this.getIntent().getStringExtra("kiva");
+        Integer posicion=this.getIntent().getIntExtra("numero", 0);
 
         try {
-            JSONObject json = new JSONObject(jsonString);
-            ((TextView) findViewById(R.id._nombre)).setText(json.getString("name"));
-            ((TextView) findViewById(R.id._pais)).setText(json.getJSONObject("location").getString("country"));
-            ((TextView) findViewById(R.id._cantidad)).setText(json.getString("loan_amount"));
-            ((TextView) findViewById(R.id._uso)).setText(json.getString("use"));
-
-            JSONObject imagenJSON = json.getJSONObject("image");
-            final int idImagen = imagenJSON.getInt("id");
-            final int idPlantilla = imagenJSON.getInt("id_template");
-            final String patronURL;
-
-            JsonObjectRequest plantillaRequest = new JsonObjectRequest("http://api.kivaws.org/v1/templates/images.json",null, new Response.Listener<JSONObject>() {
-
-                @Override
-                public void onResponse(JSONObject response){
-
-                    try {
-                        String patronURL;
-                        JSONArray plantillas = response.getJSONArray("templates");
-                        if (plantillas == null) {
-                            Log.d("DetalleActivity", "Plantilla es null");
-                        }
-                        for (int i = 0; i < plantillas.length(); i++) {
-                            JSONObject patron = plantillas.getJSONObject(i);
-                            if (patron.getInt("id") == idPlantilla) {
-                                patronURL = patron.getString("pattern");
-                                cargarImagen(patronURL, idImagen);
-                                break;
-                            } else {
-                                Log.d("DetalleActivity", "is no coincide");
-                            }
-                        }
-
-
-        } catch (JSONException exception) {
-
-                        Log.d("DetalleActivity", "JSON Exception");
-                    }
+            jsonKivaP= new JSONObject(tempkiva);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+        llenarInformacion(posicion);
 
-    },new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d("DetalleActivity", "Error al cargar imagen");
-                }
-            });
-            MySingleton.getInstance(this).getRequestQueue().add(plantillaRequest);
-
-        } catch (JSONException excepcion) {
-
-        } catch (Exception excepcion) {
-
-            Log.d("DetalleActivity", excepcion.getMessage());
-        }
-
-        Log.d("DetalleActivity", "Terminar de crear actividad");
     }
 
-    private void cargarImagen(String patronURL, int idImagen) {
-        String url = patronURL.replace("<size>", "400");
-        url = url.replace("<id>", "" + idImagen);
+    private void llenarInformacion(Integer p){
+        String loans=null;
 
-        NetworkImageView imagen = (NetworkImageView) findViewById(R.id.imagen);
-        imagen.setImageUrl(url, MySingleton.getInstance(this).getImageLoader());
+        try {
+            loans = jsonKivaP.getString("loans");
+            JSONArray arregloPersonas = new JSONArray(loans);
 
-        Log.d("DetalleActivity", "Cargando imagen");
+            JSONObject persona = (JSONObject) arregloPersonas.get(p);
+
+            String nombre = persona.getString("name");
+            String monto = persona.getString("loan_amount");
+
+            JSONObject imagen = persona.getJSONObject("image");
+            String idImagen=imagen.getString("id");
+
+            String activiad=persona.getString("activity");
+            String uso=persona.getString("use");
+            String sector=persona.getString("sector");
+
+
+            JSONObject lugar=persona.getJSONObject("location");
+            String pais =lugar.getString("country");
+            String ciudad =lugar.getString("town");
+            String publicado = persona.getString("posted_date");
+
+
+
+            NetworkImageView avatar = (NetworkImageView) findViewById(R.id.networkImageViewFoto);
+            avatar.setImageUrl("https://www.kiva.org/img/512/" + idImagen + ".jpg", MySingleton.getInstance(mContext).getImageLoader());
+
+            TextView tv = (TextView) findViewById(R.id.textViewNombre2);
+            tv.setText(nombre);
+            TextView tv2 = (TextView) findViewById(R.id.textViewActividad2);
+            tv2.setText(activiad);
+            TextView tv3 = (TextView) findViewById(R.id.textViewSector);
+            tv3.setText(sector);
+            TextView tv4 = (TextView) findViewById(R.id.textViewUso);
+            tv4.setText("Necesito $"+monto);
+            TextView tv5 = (TextView) findViewById(R.id.textViewMonto);
+            tv5.setText("Para "+uso+"\n"+"Ubicación: "+ciudad+", "+pais+"\n"+"Publicado el: "+publicado);
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            TextView tvJoseNombre = (TextView) findViewById(R.id.textViewNombre2);
+            tvJoseNombre.setText("error");
+
+        }
     }
+
 }

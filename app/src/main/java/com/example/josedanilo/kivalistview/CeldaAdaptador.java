@@ -21,51 +21,40 @@ import java.util.List;
 
 public class CeldaAdaptador extends ArrayAdapter<JSONObject> {
 
-    public CeldaAdaptador (Context context, int textViewResourseId){
-        super(context, textViewResourseId);
-    }
     public CeldaAdaptador(Context context, int resourse, List<JSONObject> items){
         super(context,resourse,items);
     }
     @Override
-    public View getView(final int position, final View convertView, ViewGroup parent)
+    public View getView(int position, View convertView, ViewGroup parent)
     {
         View celda = convertView;
         if (celda==null)
         {
             LayoutInflater layoutInflater = LayoutInflater.from(getContext());
-            celda = layoutInflater.inflate(R.layout.celda_adaptador,null);
+            celda= layoutInflater.inflate(R.layout.celda_adaptador,null);
         }
 
-        TextView id = (TextView) celda.findViewById(R.id.id);
-        TextView nombre=(TextView) celda.findViewById(R.id.nombre);
-        TextView ubicacion=(TextView) celda.findViewById(R.id.ubicacion);
-        NetworkImageView niv= (NetworkImageView)celda.findViewById(R.id.imagen);
+        TextView nombre = (TextView) celda.findViewById(R.id.textViewNombre);
+        TextView actividad=(TextView) celda.findViewById(R.id.textViewActividad);
+        NetworkImageView niv= (NetworkImageView)celda.findViewById(R.id.networkImageViewFoto);
 
         JSONObject elemento=this.getItem(position);
-        try {
-            id.setText(elemento.getString("name"));
-            nombre.setText(elemento.getString("loan_amount"));
-            ubicacion.setText(elemento.getString("use"));
 
-            String imagen=elemento.getString("id");
-            int img= Integer.parseInt(imagen);
-            String url = "https://www.kiva.org/img/512/"+img+".jpg";
-            niv.setImageUrl(url,MySingleton.getInstance(MainActivity.mContext).getImageLoader());
+
+        try {
+
+            JSONObject imagen=elemento.getJSONObject("image");
+            String idImagen=imagen.getString("id");
+            nombre.setText(elemento.getString("name"));
+            actividad.setText(elemento.getString("sector"));
+
+            niv.setImageUrl("https://www.kiva.org/img/512/" + Integer.parseInt(idImagen) + ".jpg", MySingleton.getInstance(MainActivity.mContext).getImageLoader());
+
+
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        celda.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), DetalleActivity.class);
-                intent.putExtra("JSONObject", getItem(position).toString());
-                getContext().startActivity(intent);
-            }
-        });
-
         return celda;
     }
 
